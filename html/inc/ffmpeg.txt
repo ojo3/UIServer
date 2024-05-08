@@ -1,0 +1,26 @@
+/*
+/* 編集しないで！！
+/*
+//-i "$filepath" -fflags +igndts $Codec -c:a aac -f hls -hls_time 2 -hls_list_size 0 -hls_segment_filename "$directory\%8d.ts" "$directory\$playlist"
+-i "$filepath" -fflags +igndts $Codec -c:a aac -ac 2 -f hls -hls_time 2 -hls_list_size 0 -hls_segment_filename "$directory\%8d.ts" "$directory\$playlist"
+-ss $Position -hwaccel cuda -hwaccel_output_format cuda -i "$filepath" -vf "thumbnail_cuda=2,hwdownload,format=nv12" -vframes 1 "$directory\$Guid$ThumbnailExtension" -y
+-ss $Position -itsoffset -1 -i "$filepath" "$directory\$Guid$ThumbnailExtension" -y
+-ss $Position -i "$filepath" -f image2 -vframes 1 "$directory\$Guid$ThumbnailExtension" -y
+
+
+
+/*  */
+//-i "$filepath" -ss $Position -f image2 -vframes 1 "$directory\$Guid.jpg" -y
+
+/*  */
+//-v error -show_entries format=$Key -of default=noprint_wrappers=1:nokey=1 "$filepath"
+
+/*  */
+//-itsoffset -1 -i "$filepath" -vframes 1 -filter:v scale="176:-1"  "$directory\$Guid.jpg"
+//-i "$filepath" $Codec -c:a aac -f hls -hls_time 2 -hls_list_size 0 -hls_segment_filename "$directory\%8d.ts" "$directory\$playlist"
+//ffmpeg -i "Z:\MP3\Joe Satriani\Joe Satriani\Joe Satriani - Slow Down Blues.mp3" -c:v copy -c:a aac -f hls -hls_time 2 -hls_list_size 0 -hls_segment_filename "%8d.ts" "test.m3u8"
+//-i "AFRICA (Toto) - Cover by Jonathan Young, Caleb Hyles & RichaadEB_1080P.mp4" -ss 10 -f image2 out.jpg -vframes 1
+//ffmpeg -i "Y:\ARCHIVES\#ドキュメンタリ\NNNドキュメント\(20200301-2455) NNNドキュメント 「ヌカラヤン ヌヤン 知ってくださいアイヌのこと」.mp4" -fflags +igndts -c:v libx264 -c:a mp3 -f hls -hls_time 2 -hls_list_size 0 -hls_segment_filename "%8d.ts" "test.m3u8"
+//ffmpeg -i "X:\Video\バラエティ\ごっつええ感じ\ダウンタウンのごっつええ感じ BEST OF ええ感じ3.mp4" -fflags +igndts -c:v libx264 -c:a copy -f hls -hls_time 2 -hls_list_size 0 -hls_segment_filename "%8d.ts" "test.m3u8"
+//ffmpeg -i "Y:\ARCHIVES\#ドキュメンタリ\NNNドキュメント\(20200301-2455) NNNドキュメント 「ヌカラヤン ヌヤン 知ってくださいアイヌのこと」.mp4" -fflags +igndts -c:v copy -filter_complex "[0:a]join=inputs=8:channel_layout=7.1[a]" -c:a aac -ac 2 -f hls -hls_time 2 -hls_list_size 0 -hls_segment_filename "%8d.ts" "test.m3u8"
+//ffmpeg -ss 0 -i "X:\Video\バラエティ\ごっつええ感じ\ダウンタウンのごっつええ感じ BEST OF  ええ感じ3.mp4" -f image2 -vframes 1 "test.png" -y

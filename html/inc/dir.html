@@ -1,0 +1,146 @@
+
+	<div id="page">
+		<!-- start -->
+		<div class="list">
+$List
+		</div>
+		<h3>キャッシュ</h3>
+		<div class="list" id="slippylist">
+$Cached
+		</div>
+		<!-- end -->
+	</div>
+
+	<!-- select start -->
+	<div class="selectBox">
+		<select id="tags">
+			<option value="all">すべて</option>
+$Tags
+		</select>
+		<select id="programs">
+			<option value="all">すべて</option>
+$Programs
+		</select>
+	</div>
+	<!-- select end -->
+	<a href="#" class="reload">リロード</a>
+
+	<script>
+
+		let p = 1;
+		const isInline = true;
+
+		$(() =>
+		{
+			const minHeight = $('#page').find('.list').first().height();
+			$('#page').find('.list').first().setcss({ 'min-height': minHeight });
+
+			optionToggle('#tags, #programs');
+
+			swipeInitialize();
+			if (isInline)
+				initializePlayer();
+
+			let url = generateRequestUrl(1);
+
+			// IndexReload();
+			$('#tags, #programs').change(cbxChanged);
+			$('.reload').attr({ href: url }).click(reloadClicked);
+			setTimeout(() => { $('a, button').click(() => window.navigator.vibrate(12)) }, 500);
+			$(document).on('contextmenu', (e) => { return false; });
+		});
+
+		function generateRequestUrl(page)
+		{
+			const baseUrl = location.origin;
+			const tag = $('#tags').val();
+			const programName = $('#programs').val();
+			const params = [
+				baseUrl,'video.dir',
+				'tg', tag,
+				'pr', programName,
+				'p', page];
+			return params.join('/');
+		}
+
+		function initializePlayer()
+		{
+			$('.recorditem a').click(function (e)
+			{
+				e.preventDefault();
+				const player = new VideoPlayer();
+				player.create('$SocketHost', $(this), '#container');
+				return false;
+			});
+		}
+
+		function cbxChanged(e)
+		{
+			const obj = $(this);
+			const isTagChange = obj[0].id == 'tags';
+
+			// 先に選択！！
+			if (isTagChange)
+			{
+				// イベントは発動しないみたい
+				$('#programs').prop('selectedIndex', 0);
+			}
+
+			url = generateRequestUrl(1);
+
+			const xhr = new Http().get(url)
+			.done((data) =>
+			{
+				history.replaceState(null, null, url);
+				$('#page').html(data);
+				$('.reload').attr({ href: url });
+				swipeInitialize();
+				if (isTagChange)
+					optionToggle('#tags, #programs');
+				if (isInline)
+					initializePlayer();
+				// $(document).attr('title', `${$('#tags').val()} > ${$('#programs').val()}`);
+			});
+
+			return false;
+		}
+
+		function reloadClicked(e)
+		{
+			e.preventDefault();
+
+			Toast.clear();
+
+			url = generateRequestUrl(p);
+			url = e.target.href;
+			p++;
+
+			const container = $('#page');
+
+			let xhr = new Http()
+			.settings({ progress: false })
+			.get(url)
+			.done(function (data, textStatus, jqXHR)
+			{
+				container.html(data);
+				swipeInitialize();
+				if (isInline)
+					initializePlayer();
+			})
+			.fail(function (data, textStatus, jqXHR)
+			{
+				let html = '';
+				const p = $(data.responseText).find('p');
+				for (let i = 0; i < p.length; i++)
+				{
+					const source = $(p[i]);
+					html += source[0].outerHTML;
+					console.log(source);
+				}
+				container.html(html);
+			});
+			return false;
+		}
+
+	</script>
+

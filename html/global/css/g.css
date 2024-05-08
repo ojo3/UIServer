@@ -1,0 +1,255 @@
+	pre
+	{
+		font-size: 1rem;
+	}
+
+	*
+	{
+		background-size: cover;
+		background-position: center center;
+	}
+
+	body
+	{
+		/* margin-bottom: 7.5%; */
+		background: #000;
+		background: #222;
+		background: rgb(204, 204, 204);
+		color: #fff;
+		color: #222;
+		/* font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; */
+		font-family: -apple-system,
+					BlinkMacSystemFont,
+					"Avenir Next", Avenir,
+					"Open Sans",
+					"Helvetica Neue",
+					Verdana,
+					Roboto,
+					/* "UD Digi Kyokasho NP-R", YuKyokasho, */
+					"游ゴシック体", YuGothic, "YuGothic M",
+					"ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro",
+					"メイリオ", Meiryo,
+					"ＭＳ Ｐゴシック", "MS PGothic",
+					/* "M+ 1p", */
+					sans-serif;
+
+		/* font-family: Helvetica Neue,
+			Arial,
+			Hiragino Sans,
+			Hiragino Kaku Gothic ProN,
+			BIZ UDPGothic,
+			Meiryo,
+			sans-serif; */
+
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	a
+	{
+		color: #e69;
+		color: rgb(136, 31, 69);
+	}
+
+	label
+	{
+		cursor: pointer;
+	}
+
+	#container
+	{
+		position: relative;
+		margin: 0 auto;
+		width: 72.5vw;
+		margin-top: 1em;
+		/*overflow-wrap: break-word;*/
+		/*background: #600;*/
+	}
+
+	#result
+	{
+		margin: 20px auto;
+	}
+
+	h1
+	{
+		display: block;
+		font-size: 2em;
+		margin-block-start: 0.67em;
+		margin-block-end: 0.67em;
+		margin-inline-start: 0px;
+		margin-inline-end: 0px;
+		font-weight: bold;
+	}
+
+	.item
+	{
+		color: rgb(180, 21, 61);
+	}
+
+	table
+	{
+		border-collapse: separate;
+		width: 100%;
+		table-layout: fixed;
+		/* max-width: 0; */
+	}
+
+	th
+	{
+		color: #333;
+		text-align: center;
+		padding: 2vh 0;
+		/*background-color: #245;*/
+		background-color: #111;
+		background-color: #ccc;
+	}
+
+	td
+	{
+		padding: 2vh 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/*スクロールバー全体*/
+	::-webkit-scrollbar
+	{
+		width: 15px;
+		width: 0.55rem;
+		border-radius: 0.125rem;
+	}
+
+	/*スクロールバーの軌道*/
+	::-webkit-scrollbar-track
+	{
+		border-radius: 10px;
+		border-radius: 0.155rem;
+		box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+		/* background-color: lightgray; */
+	}
+
+	::-webkit-scrollbar-thumb
+	{
+		background-color: rgba(73, 48, 48, 0.6);
+		border-radius: 10px;
+		border-radius: 0.125rem;
+		/* background-color: gray; */
+	}
+
+	.pop_top, #pop_top
+	{
+		color: #1C1E15;
+		background: #BBC891;
+	}
+
+	.toast, #toast
+	{
+		color        : #fff;
+		background   : rgba(0, 0, 0, 0.6);
+	}
+
+	.echo
+	{
+		margin-bottom: 1em;
+	}
+
+	#selectBox
+	{
+		clear: both;
+	}
+
+	select, button
+	{
+		margin: 0;
+		margin-right: 0.43vw;
+		padding: 1vh;
+		font-size: 1.0vw;
+		clear: both;
+	}
+
+	button
+	{
+		cursor: pointer;
+	}
+
+	select
+	{
+		/*min-width: 30vh;
+		min-width: auto;*/
+		background-color: rgb(0, 0, 0);
+		color: rgb(97, 73, 2);
+	}
+
+	.processtime
+	{
+		margin: 5px 0;
+		font-size: smaller;
+		text-align: right;
+	}
+
+	#loading
+	{
+		z-index: 1; 
+	}
+
+	/* MARQUEE */
+	.marquee
+	{
+		max-width: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.marquee span
+	{
+		display: block;
+		animation: marquee 10s linear infinite;
+	}
+
+	@keyframes marquee
+	{
+		0% { transform: translate(100%, 0); }
+		100% { transform: translate(-200%, 0); }
+	}
+
+	@media screen and (max-width: 780px)
+	{
+		#loading
+		{
+			padding    : 2% 5%;
+			line-height: 5vh;
+			top        : 50%;
+			left       : 25vw;
+			width      : 20vw;
+			height     : 5%;
+		}
+
+		#container
+		{
+			padding: 0;
+			margin: 0 auto;
+			width: 100%;
+			overflow-wrap: normal;
+		}
+
+		#selectBox
+		{
+			/*margin-right: 0;*/
+			width: 100%;
+			clear: both;
+		}
+
+		#selectBox *,
+		button
+		{
+			/* width: 100%;
+			margin: 0;
+			margin-right: 0;
+			margin-bottom: 0.5vw;
+			padding: 1vh 0; */
+			font-size: 100%;
+			clear: both;
+		}
+	}

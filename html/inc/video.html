@@ -1,0 +1,308 @@
+
+		<div id="player">
+			<video id="video" controls muted poster="/thumbnail/$Guid$ThumbnailExtension" crossorigin="anonymous"></video>
+		</div>
+		<h3 id="filename">$Name</h3>
+		<div class="relation">
+			<h3 class="caption toggle open" id="series">シリーズ</h3>
+			<div class="summaly scroll">
+				<ul>
+$Series
+				</ul>
+			</div>
+		</div>
+		<h3 class="caption toggle">詳細</h3>
+		<div class="summaly">
+			<table>
+$Sumally
+			</table>
+		</div>
+		<div class="filter"></div>
+
+		<script type="text/javascript">
+
+			const prefix   = '$Prefix';
+			const videoSrc = '$Playlist';
+			const guid     = '$Guid';
+
+			let isLoad      = false;
+			let playState   = false;
+			let currentTime = 0;
+			let duration    = 0;
+			let keyMap      = {
+				'Numpad0': 0, 'Numpad1': 10, 'Numpad2': 20, 'Numpad3': 30, 'Numpad4': 40,
+				'Numpad5': 50, 'Numpad6': 60, 'Numpad7': 70, 'Numpad8': 80, 'Numpad9': 90,
+			}
+			const filterButtons = { 'KeyG': '#gray', 'KeyC': '#contrast', 'KeyB': '#brightness'};
+			const pages = GetPagenation();
+
+			if (document.cookie == '')
+			{
+				Cookie.save({ loop: false, jump: false });
+			}
+
+			const cookie = Cookie.load();
+			var jump = cookie.jump;
+			var loop = cookie.loop;
+
+			setTimeout(() => { $('a, button').click(() => window.navigator.vibrate(20)) }, 500);
+
+
+			// video
+			$(() =>
+			{
+				// socket
+				const socket = Socket.connect(prefix, guid, function (MessageEvent)
+				{
+					if (MessageEvent == null)
+					{
+
+					}
+					else
+					{
+						if (MessageEvent.data === guid) isLoad = true;
+						else new Toast().show(MessageEvent.data, 'top');
+					}
+				});
+
+				var video = document.getElementById('video');
+				initializeEvent();
+
+				if (Hls.isSupported())
+				{
+					// 自動再生はChromeのメディアポリシー？的に不可らしいが、
+					// setIntervalしてやったら自動再生ぽくなったぜ.
+					const timer = setInterval(() =>
+					{
+						if (!isLoad && prefix != '')
+							return;
+						clearTimeout(timer);
+						videoLoad_Internal(videoSrc);
+					}, 100);
+				}
+				else if (video.canPlayType('application/vnd.apple.mpegurl'))
+				{
+					video.src = videoSrc;
+				}
+
+				function videoLoad_Internal(videoSrc)
+				{
+					const hls = new Hls();
+					hls.loadSource(videoSrc);
+					hls.attachMedia(video);
+					hls.on(Hls.Events.MEDIA_ATTACHED, () =>
+					{
+						video.muted = false;
+						const result = video.play();
+
+						if (result)
+						{
+							result.then(() =>
+							{
+								playState = true;
+								video.currentTime = 0;
+							})
+							.catch((ex) =>
+							{
+								playState = false;
+								console.log(ex);
+							})
+							.finally(() =>
+							{
+								windowResized();
+								// console.log(playState);
+							});
+						}
+					});
+				}
+
+				function initializeEvent()
+				{
+					document.addEventListener('keydown', (e) =>
+					{
+						// console.log(e.code);
+						const keyCode = e.code;
+						switch (keyCode)
+						{
+							case 'Space':
+								e.preventDefault();
+								if (playState) video.pause();
+								else video.play();
+								playState = !playState;
+								break;
+							case 'Backspace':
+								video.currentTime = 0;
+								break;
+							case 'ArrowRight':
+								if (currentTime + 10 < duration)
+									currentTime += 10;
+								video.currentTime = currentTime;
+								break;
+							case 'ArrowLeft':
+								if (currentTime - 10 > 0)
+									currentTime -= 10;
+								video.currentTime = currentTime;
+								break;
+							case 'KeyG':
+							case 'KeyC':
+							case 'KeyB':
+								$(filterButtons[keyCode]).click();
+								break;
+							case 'Numpad0':
+							case 'Numpad1':
+							case 'Numpad2':
+							case 'Numpad3':
+							case 'Numpad4':
+							case 'Numpad5':
+							case 'Numpad6':
+							case 'Numpad7':
+							case 'Numpad8':
+							case 'Numpad9':
+								currentTime = keyMap[keyCode];
+								video.currentTime = currentTime;
+								break;
+							default:
+								break;
+						}
+					});
+					window.addEventListener('resize', (e) =>
+					{
+						windowResized();
+					});
+					// 再生時間をNumキーにマッピング
+					video.addEventListener('durationchange', (e) =>
+					{
+						duration = video.duration;
+						const par = Math.round(duration / 10);
+						if (par !== NaN)
+						{
+							let i = 0;
+							for (const key in keyMap)
+							{
+								keyMap[key] = par * i;
+								i++;
+							}
+							// console.log(duration, keyMap);
+						}
+					});
+					video.addEventListener('timeupdate', (e) =>
+					{
+						currentTime = video.currentTime;
+					});
+					video.addEventListener('ended', () =>
+					{
+						if (!jump)
+							return;
+
+						if (pages.next)
+						{
+							new Toast().show('次の動画を再生します.');
+
+							setTimeout(() => {
+								if (pages.next !== undefined)
+									location.href = pages.next;
+							}, 1000);
+						}
+					});
+					video.addEventListener('loadedmetadata', (e) =>
+					{
+						// console.log(e);
+					});
+				}
+			});
+
+			// scroll
+			$(() =>
+			{
+				const isPc = /Windows|IPad/gi.test(window.navigator.userAgent);
+
+				if (isPc)
+				{
+					return;
+				}
+
+				const player = $('#player');
+				const width = player.outerWidth(true);
+				const borderWidth = $('video').outerWidth() - $('video').outerWidth(true);
+				const position = player.css('position');
+				const offset = player.offset();
+				
+				$(document).on(
+				{
+					scroll: function (e)
+					{
+						$('video').width(width - borderWidth);
+						const isOver = $(this).scrollTop() > 50;
+						const css = isOver ? 'sticky' : position;
+						player.setcss(`position: ${css}; top: ${offset.top}; width: ${width}; left: 0`);
+					}
+				});
+			});
+
+			// menu
+			$(() =>
+			{
+				$('.toggle').each(function (index, element)
+				{
+					const next = $(this).next();
+					const hasChildren = next.find('li').length > 1; 
+					const classes = $(element)[0].classList;
+					if (classes.contains('open'))
+					{
+						if (hasChildren) next.setcss('display: block');
+						else $(this).removeClass('open');
+					}
+				});
+
+				$('.toggle, #series').click(function ()
+				{
+					const child = $(this).next();
+					const isScroll = child.css('display') == 'none';
+					if (isScroll)
+					{
+						$(this).addClass('open');
+					}
+					else
+					{
+						$(this).removeClass('open');
+					}
+					
+					child.slideToggle(() =>
+					{
+						if ($(this).attr('id') == 'series')
+						{
+							if (isScroll)
+								ScrollToSeriesItem();
+						}
+					});
+				});
+			});
+
+			// controls
+			$(() =>
+			{
+				CustomButton.create('.filter', '#gray', 'G').filter('grayscale()', 'video');
+				CustomButton.create('.filter', '#contrast', 'C').filter('contrast(135%)', 'video');
+				CustomButton.create('.filter', '#brightness', 'B').filter('brightness(1.35)', 'video');
+
+				// createControlBotton('#loop', 'L', 'ループ', 'loop');
+				// createControlBotton('#jump', 'J', '連続再生', 'jump');
+
+				// let fit = false;
+				// createButton('#fit', 'F').click(function ()
+				// {
+				// 	const state = setState(this);
+				// 	const fitValue = fit ? 'contain' : 'fill';
+				// 	$('video').setcss(`object-fit: ${fitValue}`);
+				// 	fit = !fit;
+				// });
+			});
+
+			// Scroll To SeriesItem
+			$(() =>
+			{
+				ScrollToSeriesItem();
+			})
+
+		</script>
+
